@@ -86,7 +86,9 @@ func calculateP2(grid [][]rune, nums map[[2]int][]int) int {
 	for r := 0; r < R; r++ {
 		for c := 0; c < C; c++ {
 			if grid[r][c] == '*' {
-				p2 += nums[[2]int{r, c}][0]
+				if len(nums[[2]int{r, c}]) == 2 {
+					p2 += nums[[2]int{r, c}][0] * nums[[2]int{r, c}][1]
+				}
 			}
 		}
 	}
