@@ -8,12 +8,14 @@ import (
 	"strings"
 )
 
+// Struct to hold the map data
 type Map struct {
 	destinationStart int
 	sourceStart      int
 	length           int
 }
 
+// Parse the input file into a map of maps
 func parseInput(filename string) ([]int, map[string][]Map) {
 	file, _ := os.Open(filename)
 	defer file.Close()
@@ -30,6 +32,7 @@ func parseInput(filename string) ([]int, map[string][]Map) {
 				seed, _ := strconv.Atoi(seedStr)
 				seeds = append(seeds, seed)
 			}
+			// Parse the map data into a map of maps
 		} else if strings.Contains(line, "map:") {
 			mapName := strings.Split(line, " ")[0]
 			for scanner.Scan() {
@@ -49,6 +52,7 @@ func parseInput(filename string) ([]int, map[string][]Map) {
 	return seeds, maps
 }
 
+// Create a map from the given maps
 func createMap(maps []Map, num int) int {
 	for _, m := range maps {
 		if num >= m.sourceStart && num < m.sourceStart+m.length {
@@ -58,6 +62,7 @@ func createMap(maps []Map, num int) int {
 	return num
 }
 
+// Find the lowest location from the given seeds and maps
 func findLowestLocation(seeds []int, maps map[string][]Map) int {
 	lowestLocation := -1
 	for _, seed := range seeds {
@@ -91,11 +96,9 @@ Now, rather than considering four seed numbers, you need to consider a total of 
 In the above example, the lowest location number can be obtained from seed number 82, which corresponds to soil 84, fertilizer 84, water 84, light 77, temperature 45, humidity 46, and location 46. So, the lowest location number is 46.
 
 Consider all of the initial seed numbers listed in the ranges on the first line of the almanac. What is the lowest location number that corresponds to any of the initial seed numbers?
-
 */
 
 func main() {
 	seeds, maps := parseInput("input.txt")
-	lowestLocation := findLowestLocation(seeds, maps)
-	fmt.Printf("Part one: %d\n", lowestLocation)
+	fmt.Println(findLowestLocation(seeds, maps))
 }
