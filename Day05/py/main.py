@@ -1,64 +1,68 @@
-import os
+import sys
+import re
+from collections import defaultdict
 
-class Map:
-    def __init__(self, destinationStart, sourceStart, length):
-        self.destinationStart = destinationStart
-        self.sourceStart = sourceStart
-        self.length = length
+# Read the input file
+D = open(sys.argv[1]).read().strip()
+L = D.split('\n')
 
-def parseInput(filename):
-    # Open the file
-    with open(filename, 'r') as file:
-        lines = file.readlines()
+parts = D.split('\n\n')
+seed, *others = parts
+# Parse the seed values
+seed = [int(x) for x in seed.split(':')[1].split()]
 
-    maps = {}
-    seeds = []
+class Function:
+  def __init__(self, S):
+    # Parse the function tuples
+    self.tuples: list[tuple[int,int,int]] = [[int(x) for x in line.split()] for line in S.split('\n')[1:]]
 
-    # Loop through each line in the file
-    for line in lines:
-        # Check if the line contains seeds
-        if "seeds:" in line:
-            seeds = [int(x) for x in line.split()[1:]]
-        # Check if the line contains a map
-        elif "map:" in line:
-            mapName = line.split()[0]
-            mapData = []
-            for line in lines[lines.index(line)+1:]:
-                if line == "\n":
-                    break
-                nums = [int(x) for x in line.split()]
-                mapData.append(Map(nums[0], nums[1], nums[2]))
-            maps[mapName] = mapData
+  def apply_one(self, x: int) -> int:
+    # Apply the function to a single value
+    for (dst, src, sz) in self.tuples:
+      if src<=x<src+sz:
+        return x+dst-src
+    return x
 
-    return seeds, maps
+  def apply_range(self, R):
+    # Apply the function to a range of values
+    A = []
+    for (dest, src, sz) in self.tuples:
+      src_end = src+sz
+      # NR is the new range after applying the function
+      NR = []
+      while R:
+        (st,ed) = R.pop()
+        before = (st,min(ed,src))
+        inter = (max(st, src), min(src_end, ed))
+        after = (max(src_end, st), ed)
+        if before[1]>before[0]:
+          NR.append(before)
+        if inter[1]>inter[0]:
+          A.append((inter[0]-src+dest, inter[1]-src+dest))
+        if after[1]>after[0]:
+          NR.append(after)
+      R = NR
+    return A+R
 
-def createMap(maps, num):
-    # Loop through each map
-    for m in maps:
-        # Check if the number is within the map's range
-        if num >= m.sourceStart and num < m.sourceStart + m.length:
-            return m.destinationStart + (num - m.sourceStart)
-    return num
+# Parse the functions
+Fs = [Function(s) for s in others]
 
-def findLowestLocation(seeds, maps):
-    lowestLocation = -1
-    # Loop through each seed
-    for seed in seeds:
-        soil = createMap(maps["seed-to-soil"], seed)
-        fertilizer = createMap(maps["soil-to-fertilizer"], soil)
-        water = createMap(maps["fertilizer-to-water"], fertilizer)
-        light = createMap(maps["water-to-light"], water)
-        temperature = createMap(maps["light-to-temperature"], light)
-        humidity = createMap(maps["temperature-to-humidity"], temperature)
-        location = createMap(maps["humidity-to-location"], humidity)
-        # Check if the location is the lowest found so far
-        if lowestLocation == -1 or location < lowestLocation:
-            lowestLocation = location
-    return lowestLocation
+P1 = []
+# Apply each function to each seed value and store the results
+for x in seed:
+  for f in Fs:
+    x = f.apply_one(x)
+  P1.append(x)
+# Print the minimum result
+print(min(P1))
 
-def main():
-    seeds, maps = parseInput("input.txt")
-    print(findLowestLocation(seeds, maps))
-
-if __name__ == "__main__":
-    main()
+P2 = []
+pairs = list(zip(seed[::2], seed[1::2]))
+# Apply each function to each pair of seed values and store the results
+for st, sz in pairs:
+  R = [(st, st+sz)]
+  for f in Fs:
+    R = f.apply_range(R)
+  P2.append(min(R)[0])
+# Print the minimum result
+print(min(P2))
