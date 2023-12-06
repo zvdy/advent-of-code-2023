@@ -34,3 +34,11 @@ go run day-<day>/go/main.go
 # Rust
 cargo run --manifest-path day-<day>/rs/Cargo.toml
 ```
+
+## 🏆 Leaderboard
+
+The leaderboard is available [here](https://adventofcode.com/2023/leaderboard).
+
+### Day 5 
+_Top 10 (Part 1) and Top 8 (Part 2)_
+![Day 5](/img/day5.png)
