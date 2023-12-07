@@ -39,6 +39,6 @@ cargo run --manifest-path day-<day>/rs/Cargo.toml
 
 The leaderboard is available [here](https://adventofcode.com/2023/leaderboard).
 
-### Day 5 
+### Day 6
 _Top 10 (Part 1) and Top 8 (Part 2)_
-![Day 5](/img/day5.png)
+![Day 6](/img/day6.png)
